@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MediBook</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <div class="auth-container fade-up visible">
+        <div class="auth-header">
+            <a href="../index.html" class="logo">MediBook</a>
+            <h1>Create Account</h1>
+            <p>Join us to book appointments easily</p>
+        </div>
+        
+        <div id="authError" class="auth-error"></div>
+        <div id="authSuccess" class="auth-success"></div>
+
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="John Doe">
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="you@example.com">
+        </div>
+
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="tel" id="regPhone" placeholder="1234567890">
+        </div>
+        
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="regPass" placeholder="••••••••">
+            <button class="password-toggle" onclick="togglePass('regPass')">👁️</button>
+            <div id="strengthText" class="strength-indicator"></div>
+        </div>
+
+        <div class="input-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="regTerms">
+                I agree to the Terms & Conditions
+            </label>
+        </div>
+
+        <button class="btn btn-primary btn-full" onclick="handleRegister()">Sign Up</button>
+
+        <div class="auth-footer">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script>
+        if(Storage.getUser()) window.location.href = 'dashboard.html';
+
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        const passInput = document.getElementById('regPass');
+        passInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const text = document.getElementById('strengthText');
+            if(!val) { text.innerText = ''; return; }
+            
+            let strength = 0;
+            if(val.length >= 6) strength++;
+            if(/[A-Z]/.test(val)) strength++;
+            if(/[0-9]/.test(val)) strength++;
+            if(/[^A-Za-z0-9]/.test(val)) strength++;
+
+            if(strength <= 1) { text.innerText = 'Weak'; text.className = 'strength-indicator strength-weak'; }
+            else if(strength === 2) { text.innerText = 'Fair'; text.className = 'strength-indicator strength-fair'; }
+            else if(strength === 3) { text.innerText = 'Good'; text.className = 'strength-indicator strength-good'; }
+            else { text.innerText = 'Strong'; text.className = 'strength-indicator strength-strong'; }
+        });
+
+        function handleRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const terms = document.getElementById('regTerms').checked;
+            
+            const errorDiv = document.getElementById('authError');
+            const successDiv = document.getElementById('authSuccess');
+            errorDiv.style.display = 'none';
+
+            if(!name || !email || !phone || !pass) {
+                errorDiv.innerText = 'Please fill all fields';
+                errorDiv.style.display = 'block'; return;
+            }
+            if(!/\S+@\S+\.\S+/.test(email)) {
+                errorDiv.innerText = 'Invalid email format';
+                errorDiv.style.display = 'block'; return;
+            }
+            if(!terms) {
+                errorDiv.innerText = 'You must agree to the terms';
+                errorDiv.style.display = 'block'; return;
+            }
+
+            const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            Storage.saveUser({ name, email, phone, initials });
+            
+            successDiv.innerText = 'Account created successfully!';
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
