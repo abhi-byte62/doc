@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MediBook</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="../index.html" class="logo">MediBook</a>
+            <nav>
+                <div class="nav-item active" data-tab="tab-overview">Overview</div>
+                <div class="nav-item" data-tab="tab-appointments">Appointments</div>
+                <div class="nav-item" data-tab="tab-doctors">Find Doctors</div>
+                <div class="nav-item" data-tab="tab-profile">Profile</div>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="nav-item" onclick="handleLogout()">Logout 🚪</div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <header class="dash-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                    <h2 id="pageTitle">Dashboard Overview</h2>
+                </div>
+                <div class="user-pill">
+                    <div class="avatar" id="dashAvatar">U</div>
+                    <span id="dashUserName">User Name</span>
+                </div>
+            </header>
+
+            <!-- Overview Tab -->
+            <div id="tab-overview" class="tab-panel active">
+                <div class="welcome-banner">
+                    <div>
+                        <h2 style="color: white; margin-bottom: 10px;">Welcome back, <span id="welcomeName">User</span>!</h2>
+                        <p>Here's your healthcare summary for today.</p>
+                    </div>
+                    <button class="btn btn-white" style="background: white; color: var(--primary);" onclick="switchTab('tab-doctors')">Book Appointment</button>
+                </div>
+
+                <div class="stats-row" id="statsRow">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="section-header">
+                    <h3>Upcoming Appointments</h3>
+                    <button class="btn btn-outline btn-sm" onclick="switchTab('tab-appointments')">View All</button>
+                </div>
+                <div class="appt-list" id="overviewAppts"></div>
+            </div>
+
+            <!-- Appointments Tab -->
+            <div id="tab-appointments" class="tab-panel">
+                <div class="section-header">
+                    <h3>My Appointments</h3>
+                    <select id="apptFilter" class="input-field" style="width: auto;" onchange="renderAppointmentsTab()">
+                        <option value="All">All Status</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="appt-list" id="allAppts"></div>
+            </div>
+
+            <!-- Find Doctors Tab -->
+            <div id="tab-doctors" class="tab-panel">
+                <div class="search-box">
+                    <input type="text" id="dashSearchDoctor" placeholder="Search by name or specialty..." onkeyup="renderDashDoctors()">
+                </div>
+                <div class="doctors-grid" id="dashDoctorsGrid"></div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="tab-profile" class="tab-panel">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar" id="profileAvatar">U</div>
+                        <div>
+                            <h3 id="profileNameDisplay">Name</h3>
+                            <p class="gray" id="profileEmailDisplay">Email</p>
+                        </div>
+                    </div>
+                    <div class="profile-form">
+                        <div class="form-group full-width">
+                            <label>Full Name</label>
+                            <input type="text" id="profName" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="profEmail" class="input-field" readonly style="background: #f1f5f9;">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="profPhone" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="profDOB" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>Blood Group</label>
+                            <select id="profBlood" class="input-field">
+                                <option value="">Select</option>
+                                <option value="A+">A+</option><option value="A-">A-</option>
+                                <option value="B+">B+</option><option value="B-">B-</option>
+                                <option value="O+">O+</option><option value="O-">O-</option>
+                                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--gray-light); color: var(--gray); font-size: 0.875rem;">
+                <p>&copy; 2026 MediBook. All rights reserved.</p>
+                <p style="margin-top: 5px; color: var(--primary);">Designed and developed by <strong>abhi</strong></p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals & Toasts -->
+    <div id="dashBookingOverlay"></div>
+    <div id="dashToast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3000;"></div>
+
+    <script src="../js/data.js"></script>
+    <script>
+        const user = Storage.getUser();
+        if(!user) window.location.href = 'login.html';
+
+        function initUI() {
+            document.getElementById('dashUserName').innerText = user.name;
+            document.getElementById('dashAvatar').innerText = user.initials;
+            document.getElementById('welcomeName').innerText = user.name.split(' ')[0];
+            
+            // Profile fields
+            document.getElementById('profileAvatar').innerText = user.initials;
+            document.getElementById('profileNameDisplay').innerText = user.name;
+            document.getElementById('profileEmailDisplay').innerText = user.email;
+            document.getElementById('profName').value = user.name || '';
+            document.getElementById('profEmail').value = user.email || '';
+            document.getElementById('profPhone').value = user.phone || '';
+            document.getElementById('profDOB').value = user.dob || '';
+            document.getElementById('profBlood').value = user.blood || '';
+
+            renderOverview();
+            renderAppointmentsTab();
+            renderDashDoctors();
+        }
+
+        // Tabs logic
+        document.querySelectorAll('.nav-item[data-tab]').forEach(nav => {
+            nav.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                nav.classList.add('active');
+                const tabId = nav.getAttribute('data-tab');
+                switchTab(tabId);
+                if(window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+            });
+        });
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            const titles = {
+                'tab-overview': 'Dashboard Overview',
+                'tab-appointments': 'My Appointments',
+                'tab-doctors': 'Find Doctors',
+                'tab-profile': 'My Profile'
+            };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+            
+            // update nav active
+            document.querySelectorAll('.nav-item[data-tab]').forEach(n => {
+                n.classList.toggle('active', n.getAttribute('data-tab') === tabId);
+            });
+        };
+
+        function renderOverview() {
+            const appts = Storage.getAppointments();
+            const total = appts.length;
+            const confirmed = appts.filter(a => a.status === 'Confirmed').length;
+            const cancelled = appts.filter(a => a.status === 'Cancelled').length;
+            const past = 0; // simplistic calculation
+
+            document.getElementById('statsRow').innerHTML = `
+                <div class="stat-card"><h3>${total}</h3><p>Total Bookings</p></div>
+                <div class="stat-card"><h3>${confirmed}</h3><p>Upcoming</p></div>
+                <div class="stat-card"><h3>${confirmed}</h3><p>Confirmed</p></div>
+                <div class="stat-card"><h3>${past}</h3><p>Past Visits</p></div>
+            `;
+
+            const upcoming = appts.filter(a => a.status === 'Confirmed').slice(0, 3);
+            const container = document.getElementById('overviewAppts');
+            if(upcoming.length === 0) {
+                container.innerHTML = '<p>No upcoming appointments.</p>';
+            } else {
+                container.innerHTML = upcoming.map(a => appointmentCard(a, false)).join('');
+            }
+        }
+
+        function appointmentCard(a, showCancel) {
+            const statusClass = a.status === 'Confirmed' ? 'status-confirmed' : 'status-cancelled';
+            let cancelBtn = '';
+            if(showCancel && a.status === 'Confirmed') {
+                cancelBtn = `<button class="btn btn-outline btn-sm" onclick="cancelAppt('${a.id}')">Cancel</button>`;
+            }
+            return `
+                <div class="appt-card">
+                    <div class="appt-info">
+                        <h4>${a.doctorName}</h4>
+                        <p>${a.doctorSpecialty} • ${a.date} at ${a.time}</p>
+                    </div>
+                    <div class="appt-actions">
+                        <span class="appt-status ${statusClass}">${a.status}</span>
+                        ${cancelBtn}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.renderAppointmentsTab = function() {
+            const filter = document.getElementById('apptFilter').value;
+            let appts = Storage.getAppointments();
+            if(filter !== 'All') appts = appts.filter(a => a.status === filter);
+            
+            const container = document.getElementById('allAppts');
+            if(appts.length === 0) {
+                container.innerHTML = '<p>No appointments found.</p>';
+            } else {
+                container.innerHTML = appts.reverse().map(a => appointmentCard(a, true)).join('');
+            }
+        };
+
+        window.cancelAppt = function(id) {
+            if(confirm('Are you sure you want to cancel this appointment?')) {
+                Storage.updateAppointmentStatus(id, 'Cancelled');
+                showDashToast('Appointment cancelled');
+                renderOverview();
+                renderAppointmentsTab();
+            }
+        };
+
+        window.renderDashDoctors = function() {
+            const q = document.getElementById('dashSearchDoctor').value.toLowerCase();
+            const grid = document.getElementById('dashDoctorsGrid');
+            const filtered = DOCTORS.filter(d => d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q));
+            
+            grid.innerHTML = filtered.map(d => `
+                <div class="doctor-card">
+                    <div class="doctor-header">
+                        <div class="avatar" style="background: ${d.gradient}">${d.initials}</div>
+                        <div class="availability ${d.available ? 'available' : 'unavailable'}">${d.available ? 'Available' : 'Unavailable'}</div>
+                    </div>
+                    <h3>${d.name}</h3>
+                    <p class="specialty">${d.specialty}</p>
+                    <div class="doctor-stats"><span>⭐ ${d.rating}</span><span>${d.fee}</span></div>
+                    <button class="btn btn-primary btn-sm" style="width:100%; margin-top:15px;" onclick="openDashBooking('${d.id}')" ${!d.available ? 'disabled' : ''}>Book Now</button>
+                </div>
+            `).join('');
+        };
+
+        let dashSelectedSlot = null;
+        window.openDashBooking = function(id) {
+            const d = DOCTORS.find(x => x.id === id);
+            dashSelectedSlot = null;
+            const c = document.getElementById('dashBookingOverlay');
+            c.innerHTML = `
+                <div class="modal-overlay active" id="dModal">
+                    <div class="modal-content">
+                        <h2>Book with ${d.name}</h2>
+                        <div class="form-group" style="margin-top:20px;">
+                            <label>Date</label>
+                            <input type="date" id="dDate" class="input-field" min="${new Date().toISOString().split('T')[0]}">
+                        </div>
+                        <div class="form-group">
+                            <label>Time Slot</label>
+                            <div class="slot-grid">
+                                ${d.slots.map(s => `<button class="slot-btn" onclick="selectDashSlot(this, '${s}')">${s}</button>`).join('')}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <input type="text" id="dReason" class="input-field">
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-outline" onclick="closeDashModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="confirmDashBooking('${d.id}')">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.selectDashSlot = function(btn, slot) {
+            document.querySelectorAll('#dModal .slot-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            dashSelectedSlot = slot;
+        };
+
+        window.closeDashModal = function() {
+            const m = document.getElementById('dModal');
+            if(m) {
+                m.classList.remove('active');
+                setTimeout(() => m.remove(), 300);
+            }
+        };
+
+        window.confirmDashBooking = function(id) {
+            const date = document.getElementById('dDate').value;
+            const reason = document.getElementById('dReason').value;
+            if(!date || !dashSelectedSlot) { showDashToast('Select date and time'); return; }
+            
+            const d = DOCTORS.find(x => x.id === id);
+            Storage.saveAppointment({
+                doctorId: id, doctorName: d.name, doctorSpecialty: d.specialty,
+                patientName: user.name, date, time: dashSelectedSlot, reason, fee: d.fee
+            });
+            closeDashModal();
+            showDashToast('Appointment Confirmed!');
+            renderOverview();
+            renderAppointmentsTab();
+            switchTab('tab-appointments');
+        };
+
+        window.saveProfile = function() {
+            const name = document.getElementById('profName').value;
+            const phone = document.getElementById('profPhone').value;
+            const dob = document.getElementById('profDOB').value;
+            const blood = document.getElementById('profBlood').value;
+            
+            if(name) user.name = name;
+            user.phone = phone;
+            user.dob = dob;
+            user.blood = blood;
+            user.initials = name ? name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : user.initials;
+            
+            Storage.saveUser(user);
+            showDashToast('Profile updated!');
+            initUI();
+        };
+
+        window.showDashToast = function(msg) {
+            const container = document.getElementById('dashToast');
+            container.innerHTML = `<div class="toast show">${msg}</div>`;
+            setTimeout(() => { container.innerHTML = ''; }, 3000);
+        };
+
+        window.handleLogout = function() {
+            Storage.logout();
+            window.location.href = '../index.html';
+        };
+
+        initUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediBook - Your Health, Scheduled Perfectly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">MediBook</a>
+            <div class="nav-links">
+                <a href="#specialties">Specialties</a>
+                <a href="#doctors">Doctors</a>
+                <a href="#how-it-works">How It Works</a>
+            </div>
+            <div class="auth-buttons" id="navAuth">
+                <a href="./pages/login.html" class="btn btn-outline">Login</a>
+                <a href="./pages/register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#specialties">Specialties</a>
+            <a href="#doctors">Doctors</a>
+            <a href="#how-it-works">How It Works</a>
+            <div class="mobile-auth" id="mobileNavAuth">
+                <a href="./pages/login.html" class="btn btn-outline">Login</a>
+                <a href="./pages/register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Your Health, Scheduled Perfectly.</h1>
+                <p>Find and book appointments with top-rated doctors in your city. Experience hassle-free healthcare scheduling.</p>
+                <div class="search-box">
+                    <input type="text" id="heroSearch" placeholder="Search doctors by name or specialty...">
+                    <button class="btn btn-primary" id="btnFindDoctor">Find a Doctor</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><strong>200+</strong><span>Doctors</span></div>
+                    <div class="stat"><strong>30+</strong><span>Specialties</span></div>
+                    <div class="stat"><strong>4.9⭐</strong><span>Rating</span></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <div class="avatar gradient-1">MN</div>
+                    <div class="info">
+                        <strong>Dr. Meera Nair</strong>
+                        <span>Cardiology • ⭐ 4.9</span>
+                    </div>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="avatar gradient-2">AS</div>
+                    <div class="info">
+                        <strong>Dr. Arjun Sharma</strong>
+                        <span>Neurology • ⭐ 4.8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="specialties" class="section">
+        <div class="container fade-up">
+            <h2 class="section-title">Top Specialties</h2>
+            <div class="specialties-grid" id="specGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </section>
+
+    <section id="doctors" class="section bg-light">
+        <div class="container fade-up">
+            <h2 class="section-title">Our Doctors</h2>
+            <div class="filter-bar" id="filterBar">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="doctors-grid" id="doctorsGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="section">
+        <div class="container fade-up">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-row">
+                <div class="step">
+                    <div class="step-icon">🔍</div>
+                    <h3>1. Search</h3>
+                    <p>Find doctors by specialty or name in your location.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">📅</div>
+                    <h3>2. Book</h3>
+                    <p>Select an available time slot that works for you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">✅</div>
+                    <h3>3. Confirm</h3>
+                    <p>Provide details and instantly confirm your appointment.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🩺</div>
+                    <h3>4. Consult</h3>
+                    <p>Visit the doctor or attend a teleconsultation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="section bg-light">
+        <div class="container fade-up">
+            <h2 class="section-title">Patient Stories</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p>"Booking an appointment was so fast and easy. Great platform!"</p>
+                    <div class="patient">
+                        <strong>Rahul D.</strong>
+                    </div>
+                </div>
+                <div class="testimonial-card featured dark">
+                    <p>"I found a great cardiologist within minutes. The entire process is seamless and the interface is incredibly smooth."</p>
+                    <div class="patient">
+                        <strong>Sneha P.</strong>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p>"No more waiting in lines to get an appointment. Love MediBook!"</p>
+                    <div class="patient">
+                        <strong>Vikram S.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-banner fade-up">
+        <div class="container">
+            <h2>Ready to prioritize your health?</h2>
+            <p>Join thousands of patients who trust MediBook for their healthcare needs.</p>
+            <a href="./pages/register.html" class="btn btn-primary btn-large">Create Free Account</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>MediBook</h3>
+                    <p>Your Health, Scheduled Perfectly.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="#specialties">Specialties</a>
+                    <a href="#doctors">Doctors</a>
+                    <a href="#how-it-works">How It Works</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MediBook. All rights reserved.</p>
+                <p style="margin-top: 10px; font-size: 0.875rem; color: var(--primary);">Designed and developed by <strong>abhi</strong></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Modal Overlay -->
+    <div id="modalContainer"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script src="./js/data.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
